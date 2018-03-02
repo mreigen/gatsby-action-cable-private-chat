@@ -18,10 +18,16 @@ var receiverId = query.receiver;
 console.log('sender id: ' + myId);
 console.log('receiver id: ' + receiverId);
 
+// STEP 1: initialize the ChatConnection class
+var chatConn = new ChatConnection('ws://localhost:3001/v1/chat', myId, receiverId);
+
 function handleKeyPress(event) {
   if(event.key == 'Enter'){
     console.log('enter press here! ')
 
+    // STEP 2: broadcast the message
+
+    chatConn.broadcast(event.target.value);
     event.target.value = '';
     return event.preventDefault();
   }
