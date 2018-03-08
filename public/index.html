@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<head>
+  <title>Pusher Test</title>
+  <style type="text/css">
+    .notification-badge {
+      margin-right: 2px;
+      position: relative;
+      float: left;
+      margin-top: 0px;
+    }
+  </style>
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <script
+        src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+  <script src="https://js.pusher.com/4.1/pusher.min.js"></script>
+  <script src="/notify.min.js"></script>
+  <script src="/notification.js"></script>
+
+  <script>
+    // Enable pusher logging - don't include this in production
+    Pusher.logToConsole = true;
+
+    var notification = new Notification({
+      pusherKey: "fbc1532ded27b30bcff6",
+      currentUserId: "UaGDdy5IjoEvE6EQEceBjIrdj",
+      badgeHtmlClass: "notification-badge"
+    });
+  </script>
+</head>
+
+<body>
+  <div class="container">
+    <span class="notification-badge badge badge-pill badge-danger">0</span>
+  </div>
+</span>
