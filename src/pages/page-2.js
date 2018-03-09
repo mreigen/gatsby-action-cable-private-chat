@@ -9,8 +9,7 @@ import RequestConnection from './request_notification.js'
 //ws://localhost:3001/v1/request_notif
 
 // production data
-//http://localhost:8000/?myId=UgKMA2PvpgLUI4dDao0H8pVoJ&receiver=UlFDWkvb780PE9XNUHeQH45mg
-//http://localhost:8000/?myId=UlFDWkvb780PE9XNUHeQH45mg
+//http://localhost:8000/page-2?myId=UwkN4tZscQp6QpXQFosHwILPc
 //ws://ewm-api.herokuapp.com/v1/request_notif
 
 var query = getQueryParams(document.location.search);
@@ -27,7 +26,7 @@ function callback(data) {
   $('#messages').append(data.sender.first_name + ' sent you a request: ' + data.request.intro + '. <br/>');
 }
 // STEP 2: initialize the RequestConnection class
-var reqConn = new RequestConnection('ws://localhost:3001/v1/request_notif', myId, callback);
+var reqConn = new RequestConnection('ws://ewm-api.herokuapp.com/v1/request_notif', myId, callback);
 // --------------------------- END -----------------------------
 
 
