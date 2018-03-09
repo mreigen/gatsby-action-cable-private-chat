@@ -5,11 +5,11 @@ import $ from 'jquery'
 import RequestConnection from './request_notification.js'
 
 // localhost data
-//http://localhost:8000/page-2?myId=UaGDdy5IjoEvE6EQEceBjIrdj
+//http://localhost:8000/request-notifs?myId=UaGDdy5IjoEvE6EQEceBjIrdj
 //ws://localhost:3001/v1/request_notif
 
 // production data
-//http://localhost:8000/page-2?myId=UwkN4tZscQp6QpXQFosHwILPc
+//http://localhost:8000/request-notifs?myId=UwkN4tZscQp6QpXQFosHwILPc
 //ws://ewm-api.herokuapp.com/v1/request_notif
 
 var query = getQueryParams(document.location.search);
