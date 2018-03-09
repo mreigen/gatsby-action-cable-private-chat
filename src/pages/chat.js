@@ -1,16 +1,17 @@
 import React from 'react'
 import Link from 'gatsby-link'
 import ChatConnection from './chat_connection.js'
+import $ from 'jquery'
 
 // 'ws://localhost:3001/v1/chat'
 
 // localhost data
-//http://localhost:8000/?myId=UXtCx5p1mLv97azMrFpFKf3Rr&receiver=UvmXlTDzxqUSdY2mFSlvJPSez
-//http://localhost:8000/?myId=UvmXlTDzxqUSdY2mFSlvJPSez
+//http://localhost:8000/chat?myId=UXtCx5p1mLv97azMrFpFKf3Rr&receiver=UvmXlTDzxqUSdY2mFSlvJPSez
+//http://localhost:8000/chat?myId=UvmXlTDzxqUSdY2mFSlvJPSez
 
 // production data
-//http://localhost:8000/?myId=UgKMA2PvpgLUI4dDao0H8pVoJ&receiver=UlFDWkvb780PE9XNUHeQH45mg
-//http://localhost:8000/?myId=UlFDWkvb780PE9XNUHeQH45mg
+//http://localhost:8000/chat?myId=UgKMA2PvpgLUI4dDao0H8pVoJ&receiver=UlFDWkvb780PE9XNUHeQH45mg
+//http://localhost:8000/chat?myId=UlFDWkvb780PE9XNUHeQH45mg
 
 var query = getQueryParams(document.location.search);
 var myId = query.myId;
@@ -18,8 +19,13 @@ var receiverId = query.receiver;
 console.log('sender id: ' + myId);
 console.log('receiver id: ' + receiverId);
 
-// STEP 1: initialize the ChatConnection class
-var chatConn = new ChatConnection('ws://localhost:3001/v1/chat', myId, receiverId);
+// STEP 1: set up a callback function
+function callback(data) {
+  $('#messages').append("<span class='my-name'>" + data['sender'] + '</span>: ' + data['content'] + '<br/>');
+}
+
+// STEP 2: initialize the ChatConnection class
+var chatConn = new ChatConnection('ws://localhost:3001/v1/chat', myId, receiverId, callback);
 
 function handleKeyPress(event) {
   if(event.key == 'Enter'){
