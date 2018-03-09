@@ -6,29 +6,35 @@ import RequestConnection from './request_notification.js'
 
 // localhost data
 //http://localhost:8000/page-2?myId=UaGDdy5IjoEvE6EQEceBjIrdj
+//ws://localhost:3001/v1/request_notif
 
 // production data
 //http://localhost:8000/?myId=UgKMA2PvpgLUI4dDao0H8pVoJ&receiver=UlFDWkvb780PE9XNUHeQH45mg
 //http://localhost:8000/?myId=UlFDWkvb780PE9XNUHeQH45mg
+//ws://ewm-api.herokuapp.com/v1/request_notif
 
 var query = getQueryParams(document.location.search);
 var myId = query.myId;
 console.log('sender id: ' + myId);
 var count = 0;
 
+
+// --------- BUILD CONNECTION FOR REQUEST NOTIFICATION ---------
+// STEP 1: create a callback function
 function callback(data) {
   count++;
-  $('#request_count').html(count);
-  $('#messages').append('Receive a request from: ' + data.sender.guid + '.<br/>');
+  $('#request-count').html(count);
+  $('#messages').append(data.sender.first_name + ' sent you a request: ' + data.request.intro + '. <br/>');
 }
+// STEP 2: initialize the RequestConnection class
+var reqConn = new RequestConnection('ws://localhost:3001/v1/request_notif', myId, callback);
+// --------------------------- END -----------------------------
 
-// STEP 1: initialize the RequestConnection class
-var reqConn = new RequestConnection('ws://localhost:3001/v1/requests', myId, callback);
 
 const RequestConnectionPage = () => (
   <div>
     <h4>Me: {myId}</h4>
-    Number of requests received: <span id='request_count'>0</span>
+    Number of requests received: <span id='request-count'>0</span>
     <pre id='messages'></pre>
   </div>
 )

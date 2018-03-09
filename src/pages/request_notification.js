@@ -17,7 +17,6 @@ RequestConnection.prototype.createNotifConnection = function(myId) {
     disconnected: function() {},
     received: function(data) {
       var theirReceiverId = data.receiver.guid;
-      var theirSenderId = data.sender.guid;
 
       // compares their receiver to self guid (sender guid)
       // if they match, it means the message is for this user
