@@ -1,13 +1,13 @@
 import React from 'react'
 import Link from 'gatsby-link'
-import ChatConnection from './chat_connection.js'
+import ChatConnection from './chat_connection_2.js'
 import $ from 'jquery'
 
 // 'ws://localhost:3001/v1/chat'
 
 // localhost data
-//http://localhost:8000/chat?myId=UXtCx5p1mLv97azMrFpFKf3Rr&receiver=UvmXlTDzxqUSdY2mFSlvJPSez
-//http://localhost:8000/chat?myId=UvmXlTDzxqUSdY2mFSlvJPSez
+//http://localhost:8000/chat?myId=parasect&receiver=porygon
+//http://localhost:8000/chat?myId=porygon&receiver=parasect
 
 // production data
 //http://localhost:8000/chat?myId=UgKMA2PvpgLUI4dDao0H8pVoJ&receiver=UlFDWkvb780PE9XNUHeQH45mg
@@ -21,20 +21,24 @@ console.log('receiver id: ' + receiverId);
 
 // STEP 1: set up a callback function
 function callback(data) {
-  $('#messages').append("<span class='my-name'>" + data['sender'] + '</span>: ' + data['content'] + '<br/>');
+  console.log(data);
+  $('#messages').append("<span class='my-name'>" + data.sender.first_name + '</span>: ' + data.content + '<br/>');
 }
 
 // STEP 2: initialize the ChatConnection class
-var chatConn = new ChatConnection('ws://localhost:3001/v1/chat', myId, receiverId, callback);
+var chatConn = new ChatConnection('ws://localhost:3001/v1/chat', myId, callback);
 
 function handleKeyPress(event) {
   if(event.key == 'Enter'){
     console.log('enter press here! ')
 
-    // STEP 2: broadcast the message
+    // STEP 3: broadcast the message
 
-    chatConn.broadcast(event.target.value);
+    var message = event.target.value;
+    chatConn.talk(message, receiverId);
     event.target.value = '';
+
+    $('#messages').append("<span class='my-name'>Me</span>: " + message + '<br/>');
     return event.preventDefault();
   }
 }
