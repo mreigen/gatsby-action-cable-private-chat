@@ -9,7 +9,7 @@ import RequestConnection from './request_notification.js'
 //ws://localhost:3001/v1/request_notif
 
 // production data
-//http://localhost:8000/request-notifs?myId=UwkN4tZscQp6QpXQFosHwILPc
+//http://localhost:8000/request-notifs?myId=UrR4G3nzTXx
 //ws://ewm-api.herokuapp.com/v1/request_notif
 
 var query = getQueryParams(document.location.search);
