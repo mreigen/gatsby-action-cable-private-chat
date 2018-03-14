@@ -20,15 +20,25 @@ RequestConnection.prototype.createNotifConnection = function(myId) {
     disconnected: function() {},
     received: function(data) {
       var theirReceiverId = data.receiver.guid;
+      var requestId = data.request.guid;
+      scope.updateRequestUrl += requestId;
 
       // compares their receiver to self guid (sender guid)
       // if they match, it means the message is for this user
       if (theirReceiverId == myId) {
+        // sends a read receipt
+        scope.sendReadReceipt();
         return scope.callback(data);
       }
     },
     speak: function() {}
   });
+}
+
+RequestConnection.prototype.sendReadReceipt = function() {
+  axios.put(this.updateRequestUrl, {
+    read: true
+  }).then(res => console.log(res));
 }
 
 export default RequestConnection;
