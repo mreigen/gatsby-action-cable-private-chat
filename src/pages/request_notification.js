@@ -1,7 +1,9 @@
 import ActionCable from 'actioncable'
 import axios from 'axios'
 
-function RequestConnection(ws_url, senderId, callback) {
+function RequestConnection(baseUrl, senderId, callback) {
+  var ws_url = 'ws://' + baseUrl + '/v1/request_notif';
+  this.updateRequestUrl = 'http://' + baseUrl + '/v1/requests/'; // + requestId
   this.senderId = senderId;
   this.callback = callback;
 

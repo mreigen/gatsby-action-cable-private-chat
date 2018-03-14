@@ -26,7 +26,9 @@ function callback(data) {
   $('#messages').append(data.sender.first_name + ' sent you a request: ' + data.request.intro + '. <br/>');
 }
 // STEP 2: initialize the RequestConnection class
-var reqConn = new RequestConnection('ws://ewm-api.herokuapp.com/v1/request_notif', myId, callback);
+var baseUrl = 'localhost:3001'
+// var baseUrl = 'ewm-api.herokuapp.com'
+var reqConn = new RequestConnection(baseUrl, myId, callback);
 // --------------------------- END -----------------------------
 
 
