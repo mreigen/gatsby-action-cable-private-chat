@@ -1,4 +1,5 @@
 import ActionCable from 'actioncable'
+import axios from 'axios'
 
 function RequestConnection(ws_url, senderId, callback) {
   this.senderId = senderId;
