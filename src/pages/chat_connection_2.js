@@ -34,6 +34,7 @@ ChatConnection.prototype.createNotifConnection = function() {
       // if they match, it means the message is for this user
       if (theirReceiverId == scope.senderId) {
         if (scope.roomChannel == null) {
+          scope.receiverId = data.sender.username;
           roomCode = data.room_code;
           scope.roomChannel = scope.createRoomConnection(roomCode);
         }
@@ -81,11 +82,12 @@ ChatConnection.prototype.createRoomConnection = function(roomCode) {
       if (data.receiver.username == scope.senderId) {
         scope.receiverId = data.sender.username;
         if (data.content == 'ping') {
-          this.speak('ping-back');
-        }
-        else if (data.content == 'ping-back') {
-          console.log('ping-back received, sending the first message now');
-          this.speak(localStorage.getItem('firstMessage'));
+          console.log('ping received, sending the first message now');
+          var firstMessage = localStorage.getItem('firstMessage');
+          if (firstMessage) {
+            this.speak(firstMessage);
+            localStorage.setItem('firstMessage', null);
+          }
         } else {
           return scope.callback(data);
         }
