@@ -1,17 +1,37 @@
 import ActionCable from 'actioncable'
+import axios from 'axios'
 
-function ChatConnection(ws_url, senderId, callback) {
+function ChatConnection(baseUrl, senderId, callback) {
+  var wsUrl = 'ws://' + baseUrl + '/v1/request_notif';
+  this.baseUrl = baseUrl;
+
+  this.roomId = null;
   this.senderId = senderId;
   this.callback = callback;
 
-  this.connection = ActionCable.createConsumer(ws_url);
+  this.connection = ActionCable.createConsumer(wsUrl);
   this.notifChannel = this.createNotifConnection();
   this.roomChannel = null;
   this.receiverId = null;
 }
 
-ChatConnection.prototype.talk = function(message, receiverId) {
-  this.notifChannel.speak(message, receiverId);
+ChatConnection.prototype.getChatHistory = function(receiverId) {
+  return new Promise((resolve, reject) => {
+    let getRoomIdUrl = 'http://' + this.baseUrl + '/v1/users/' + this.senderId + '/conversations/get_info'
+    getRoomIdUrl += '?receiver_id=' + receiverId;
+
+    // TODO: authentication
+
+    axios.get(getRoomIdUrl).then(res => {
+      if (res.data) {
+        resolve(res.data)
+      }
+    })
+  });
+}
+
+ChatConnection.prototype.talk = function(message, roomId) {
+  this.notifChannel.speak(message, roomId);
 }
 
 ChatConnection.prototype.createNotifConnection = function() {
@@ -23,45 +43,26 @@ ChatConnection.prototype.createNotifConnection = function() {
       console.log('connected to chat notification channel!');
     },
     disconnected: function() {},
-    // receiver receives a broadcast signal from sender with a roomCode 123
-    // Receiver checks to see if that's for him
-    // If it's for him, Receiver then "gets on line 123" to talk to Sender
     received: function(data) {
-      var theirReceiverId = data.receiver.username;
-      var roomCode        = null;
-
-      // compares sender to self by guid or username
-      // if they match, it means the message is for this user
-      if (theirReceiverId == scope.senderId) {
+      if (data.participants.indexOf(scope.senderId) != -1) {
         if (scope.roomChannel == null) {
-          scope.receiverId = data.sender.username;
-          roomCode = data.room_code;
-          scope.roomChannel = scope.createRoomConnection(roomCode);
+          scope.roomId = data.room_id;
+          scope.roomChannel = scope.createRoomConnection();
         }
-
-        // this is so that after user refreshed the page, roomCode is still there. So she won't lose "the line".
-        // see line 28 if (roomCode)
-        localStorage.setItem('roomCode', roomCode);
       }
     },
-    // broadcast a signal to all listeners on this notif channel
-    // that a sender (this user) wants to talk to the receiver
-    // and the room code is 123, telling receiver, please "get on line" 123 to talk to me
-    speak: function(message, receiverId) {
-      scope.receiverId = receiverId;
-      var roomCode = null;
+    speak: function(message, roomId) {
+      scope.roomId = roomId;
 
       if (scope.roomChannel == null) {
-        roomCode = ChatConnection.generateRoomCode();
-        scope.roomChannel = scope.createRoomConnection(roomCode);
+        scope.roomChannel = scope.createRoomConnection();
 
         // not sending the first message yet, just pinging
         localStorage.setItem('firstMessage', message);
 
         return this.perform('speak', {
           sender:    scope.senderId,
-          receiver:  receiverId,
-          room_code: roomCode
+          room_id: scope.roomId
         });
       } else {
         scope.roomChannel.speak(message);
@@ -70,21 +71,21 @@ ChatConnection.prototype.createNotifConnection = function() {
   });
 }
 
-ChatConnection.prototype.createRoomConnection = function(roomCode) {
+ChatConnection.prototype.createRoomConnection = function() {
   var scope = this;
-  return this.connection.subscriptions.create({channel: 'RoomChannel', room_code: roomCode, sender: scope.senderId, receiver: scope.receiverId}, {
+  return this.connection.subscriptions.create({channel: 'RoomChannel', room_id: scope.roomId, sender: scope.senderId, receiver: scope.receiverId}, {
     connected: function() {
-      console.log('connected to RoomChannel. Room code: ' + roomCode + '. Pinging the other end of the line...');
+      console.log('connected to RoomChannel. Room code: ' + scope.roomId + '. Pinging the other end of the line...');
       this.speak('ping');
     },
     disconnected: function() {},
     received: function(data) {
-      if (data.receiver.username == scope.senderId) {
+      if (data.participants.indexOf(scope.senderId) != -1) {
         scope.receiverId = data.sender.username;
         if (data.content == 'ping') {
           console.log('ping received, sending the first message now');
           var firstMessage = localStorage.getItem('firstMessage');
-          if (firstMessage) {
+          if (firstMessage != 'null') {
             this.speak(firstMessage);
             localStorage.setItem('firstMessage', null);
           }
@@ -95,23 +96,12 @@ ChatConnection.prototype.createRoomConnection = function(roomCode) {
     },
     speak: function(message) {
       return this.perform('speak', {
-        room_code: roomCode,
-        message:   message,
-        sender:    scope.senderId,
-        receiver:  scope.receiverId
+        room_id: scope.roomId,
+        message: message,
+        sender:  scope.senderId
       });
     }
   });
-}
-
-ChatConnection.generateRoomCode = function() {
-  var length = 8,
-    charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
-    retVal = "";
-  for (var i = 0, n = charset.length; i < length; ++i) {
-    retVal += charset.charAt(Math.floor(Math.random() * n));
-  }
-  return retVal;
 }
 
 export default ChatConnection;

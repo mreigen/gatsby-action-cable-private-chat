@@ -13,34 +13,55 @@ import $ from 'jquery'
 //http://localhost:8000/chat?myId=UgKMA2PvpgLUI4dDao0H8pVoJ&receiver=UlFDWkvb780PE9XNUHeQH45mg
 //http://localhost:8000/chat?myId=UlFDWkvb780PE9XNUHeQH45mg
 
+var roomId = null;
 var query = getQueryParams(document.location.search);
 var myId = query.myId;
 var receiverId = query.receiver;
 console.log('sender id: ' + myId);
 console.log('receiver id: ' + receiverId);
 
-// STEP 1: set up a callback function
-function callback(data) {
-  console.log(data);
-  $('#messages').append("<span class='my-name'>" + data.sender.username + '</span>: ' + data.content + '<br/>');
+// STEP 1: sets up a callback function
+function callback(message) {
+  displayMessage(message);
 }
 
-// STEP 2: initialize the ChatConnection class
-var chatConn = new ChatConnection('ws://localhost:3001/v1/chat', myId, callback);
+// STEP 2: initializes the ChatConnection class
+var chatConn = new ChatConnection('localhost:3001', myId, callback);
+
+// STEP 3: gets chat history between sender (already set in the constructor) and receiver.
+// room id is also in the response
+chatConn.getChatHistory(receiverId).then(result => {
+  // saves RoomId to send messages to
+  roomId = result.room_code;
+  console.log(roomId);
+
+  // displays the chat history
+  $('#messages').html('')
+  $.each(result.messages, function(index, message) {
+    displayMessage(message);
+  });
+})
 
 function handleKeyPress(event) {
   if(event.key == 'Enter'){
-    console.log('enter press here! ')
-
-    // STEP 3: broadcast the message
-
     var message = event.target.value;
-    chatConn.talk(message, receiverId);
     event.target.value = '';
 
-    $('#messages').append("<span class='my-name'>Me</span>: " + message + '<br/>');
+    // STEP 4: broadcast the message to the room
+    chatConn.talk(message, roomId);
+
     return event.preventDefault();
   }
+}
+
+function displayMessage(message) {
+  let sender;
+  if (message.sender.username == myId) {
+    sender = 'Me';
+  } else {
+    sender = message.sender.username;
+  }
+  $('#messages').append("<span class='my-name'>" + sender + "</span>: " + message.content + '<br/>');
 }
 
 const IndexPage = () => (
