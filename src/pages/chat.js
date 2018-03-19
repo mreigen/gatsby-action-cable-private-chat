@@ -20,12 +20,15 @@ var receiverId = query.receiver;
 console.log('sender id: ' + myId);
 console.log('receiver id: ' + receiverId);
 
+// ==============================================================
+//  CHAT INTEGRATION: STARTS FROM HERE
+
 // STEP 1: sets up a callback function
 function callback(message) {
   displayMessage(message);
 }
 
-// STEP 2: initializes the ChatConnection class
+// STEP 2: initializes the ChatConnection class and start listening
 var chatConn = new ChatConnection('localhost:3001', myId, callback);
 
 // STEP 3: gets chat history between sender (already set in the constructor) and receiver.
@@ -49,6 +52,8 @@ function handleKeyPress(event) {
 
     // STEP 4: broadcast the message to the room
     chatConn.talk(message, roomId);
+//  CHAT INTEGRATION ENDS
+// ============================================================
 
     return event.preventDefault();
   }
