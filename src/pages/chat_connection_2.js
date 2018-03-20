@@ -89,7 +89,7 @@ ChatConnection.prototype.createRoomConnection = function() {
             this.speak(firstMessage);
             localStorage.setItem('firstMessage', null);
           }
-        } else {
+        } else if (data.sender.username != scope.senderId) {
           return scope.callback(data);
         }
       }

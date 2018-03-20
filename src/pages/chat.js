@@ -10,8 +10,8 @@ import $ from 'jquery'
 //http://localhost:8000/chat?myId=porygon&receiver=parasect
 
 // production data
-//http://localhost:8000/chat?myId=UgKMA2PvpgLUI4dDao0H8pVoJ&receiver=UlFDWkvb780PE9XNUHeQH45mg
-//http://localhost:8000/chat?myId=UlFDWkvb780PE9XNUHeQH45mg
+//http://localhost:8000/chat?myId=timchang&receiver=james
+//http://localhost:8000/chat?myId=james&receiver=timchang
 
 var roomId = null;
 var query = getQueryParams(document.location.search);
@@ -29,6 +29,7 @@ function callback(message) {
 }
 
 // STEP 2: initializes the ChatConnection class and start listening
+// var chatConn = new ChatConnection('ewm-api.herokuapp.com', myId, callback);
 var chatConn = new ChatConnection('localhost:3001', myId, callback);
 
 // STEP 3: gets chat history between sender (already set in the constructor) and receiver.
@@ -50,6 +51,7 @@ function handleKeyPress(event) {
     var message = event.target.value;
     event.target.value = '';
 
+    $('#messages').append("<span class='my-name'>Me</span>: " + message + '<br/>');
     // STEP 4: broadcast the message to the room
     chatConn.talk(message, roomId);
 //  CHAT INTEGRATION ENDS
